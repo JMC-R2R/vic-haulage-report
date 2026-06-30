@@ -1,0 +1,374 @@
+<!DOCTYPE html>
+<html lang="en-AU">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Vic. Haulage Co. — Google Ads Report</title>
+<link rel="preconnect" href="https://fonts.googleapis.com">
+<link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+<link href="https://fonts.googleapis.com/css2?family=Archivo:wght@400;600;700;800;900&family=Space+Mono:wght@400;700&display=swap" rel="stylesheet">
+<script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+<style>
+  :root{
+    --blue:#17B4F0;
+    --ink:#0B0E11;
+    --ink2:#11161B;
+    --panel:#161C22;
+    --line:#222B33;
+    --text:#E8EDF1;
+    --muted:#8A98A5;
+    --good:#3FD17A;
+    --warn:#F5B042;
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    background:var(--ink);
+    color:var(--text);
+    font-family:'Archivo',system-ui,sans-serif;
+    line-height:1.55;
+    -webkit-font-smoothing:antialiased;
+  }
+  .mono{font-family:'Space Mono',monospace}
+  .wrap{max-width:920px;margin:0 auto;padding:0 28px}
+
+  /* ---------- COVER ---------- */
+  .cover{
+    min-height:100vh;
+    display:flex;flex-direction:column;justify-content:space-between;
+    padding:64px 56px;
+    background:
+      radial-gradient(120% 80% at 100% 0%, rgba(23,180,240,.18) 0%, rgba(23,180,240,0) 55%),
+      linear-gradient(180deg,#0B0E11 0%, #0E141A 100%);
+    border-bottom:1px solid var(--line);
+  }
+  .brand{display:flex;align-items:center;gap:12px;font-weight:800;letter-spacing:.02em}
+  .brand .dot{width:12px;height:12px;border-radius:50%;background:var(--blue);box-shadow:0 0 18px var(--blue)}
+  .brand small{display:block;color:var(--muted);font-weight:600;font-size:12px;letter-spacing:.18em;text-transform:uppercase}
+  .cover-mid{margin-top:auto}
+  .eyebrow{
+    font-family:'Space Mono',monospace;color:var(--blue);
+    letter-spacing:.22em;text-transform:uppercase;font-size:13px;margin-bottom:18px
+  }
+  .cover h1{
+    font-size:64px;line-height:1.02;font-weight:900;letter-spacing:-.02em;margin-bottom:18px
+  }
+  .cover h1 span{color:var(--blue)}
+  .cover .sub{color:var(--muted);font-size:18px;max-width:540px}
+  .cover-foot{display:flex;justify-content:space-between;align-items:flex-end;margin-top:48px;color:var(--muted);font-size:13px}
+  .cover-foot .mono{color:var(--text)}
+
+  /* ---------- SECTIONS ---------- */
+  section{padding:64px 0;border-bottom:1px solid var(--line)}
+  .kicker{font-family:'Space Mono',monospace;color:var(--blue);font-size:12px;letter-spacing:.2em;text-transform:uppercase;margin-bottom:10px}
+  h2{font-size:32px;font-weight:800;letter-spacing:-.01em;margin-bottom:8px}
+  h3{font-size:20px;font-weight:700;margin:28px 0 12px}
+  .lead{color:var(--muted);font-size:16px;max-width:660px;margin-bottom:8px}
+
+  /* TOC */
+  .toc{display:grid;gap:10px;margin-top:24px}
+  .toc a{
+    display:flex;align-items:center;gap:16px;text-decoration:none;color:var(--text);
+    padding:16px 20px;background:var(--panel);border:1px solid var(--line);border-radius:12px;
+    transition:.18s
+  }
+  .toc a:hover{border-color:var(--blue);transform:translateX(4px)}
+  .toc .n{font-family:'Space Mono',monospace;color:var(--blue);font-size:14px;min-width:28px}
+  .toc .t{font-weight:600}
+  .toc .d{margin-left:auto;color:var(--muted);font-size:13px}
+
+  /* Scorecards */
+  .cards{display:grid;grid-template-columns:repeat(4,1fr);gap:14px;margin-top:8px}
+  .card{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:20px}
+  .card .lbl{color:var(--muted);font-size:12px;letter-spacing:.08em;text-transform:uppercase;margin-bottom:10px}
+  .card .val{font-size:30px;font-weight:800;font-family:'Space Mono',monospace;letter-spacing:-.02em}
+  .card .delta{font-size:13px;font-weight:700;margin-top:8px}
+  .up{color:var(--good)}.down{color:var(--warn)}
+  .card .note{color:var(--muted);font-size:12px;margin-top:4px}
+
+  /* Table */
+  .tablewrap{overflow-x:auto;margin-top:8px;border:1px solid var(--line);border-radius:14px}
+  table{width:100%;border-collapse:collapse;font-size:15px;min-width:560px}
+  thead th{
+    background:var(--ink2);color:var(--muted);text-align:right;font-weight:700;
+    font-size:12px;letter-spacing:.06em;text-transform:uppercase;padding:14px 18px;border-bottom:1px solid var(--line)
+  }
+  thead th:first-child{text-align:left}
+  tbody td{padding:14px 18px;text-align:right;border-bottom:1px solid var(--line);font-family:'Space Mono',monospace}
+  tbody td:first-child{text-align:left;font-family:'Archivo';font-weight:600;color:var(--text)}
+  tbody tr:last-child td{border-bottom:none}
+  tbody tr.hl td{background:rgba(23,180,240,.06)}
+  td .tag{font-size:12px}
+
+  /* Charts */
+  .chartbox{background:var(--panel);border:1px solid var(--line);border-radius:14px;padding:24px;margin-top:18px}
+  .chartgrid{display:grid;grid-template-columns:1fr 1fr;gap:14px}
+  .chartbox h4{font-size:14px;font-weight:700;margin-bottom:14px;color:var(--text)}
+  .chartbox .cap{color:var(--muted);font-size:12px;margin-top:12px}
+  canvas{max-height:260px}
+
+  /* Wins */
+  .wins{display:grid;gap:14px;margin-top:8px}
+  .win{display:flex;gap:16px;background:var(--panel);border:1px solid var(--line);border-left:3px solid var(--good);border-radius:12px;padding:18px 20px}
+  .win .ico{font-size:22px}
+  .win b{display:block;font-size:17px;margin-bottom:2px}
+  .win p{color:var(--muted);font-size:14px;margin:0}
+  .watch .win{border-left-color:var(--warn)}
+
+  ul.next{list-style:none;display:grid;gap:12px;margin-top:8px;counter-reset:step}
+  ul.next li{position:relative;padding:16px 20px 16px 58px;background:var(--panel);border:1px solid var(--line);border-radius:12px}
+  ul.next li::before{counter-increment:step;content:counter(step);position:absolute;left:18px;top:50%;transform:translateY(-50%);
+    width:26px;height:26px;border-radius:50%;background:var(--blue);color:var(--ink);font-family:'Space Mono';font-weight:700;
+    display:flex;align-items:center;justify-content:center;font-size:14px}
+  ul.next b{color:var(--text)}
+
+  footer{padding:40px 0 60px;color:var(--muted);font-size:13px;text-align:center}
+  footer .brand{justify-content:center;margin-bottom:10px}
+
+  @media(max-width:720px){
+    .cover{padding:40px 26px}.cover h1{font-size:42px}
+    .cards{grid-template-columns:repeat(2,1fr)}
+    .chartgrid{grid-template-columns:1fr}
+    section{padding:48px 0}
+  }
+  @media print{
+    body{background:#fff;color:#000}
+    .cover{min-height:auto}
+    section{break-inside:avoid}
+  }
+</style>
+</head>
+<body>
+
+<!-- COVER -->
+<header class="cover">
+  <div class="brand">
+    <span class="dot"></span>
+    <div>Ready to Rank<small>Digital Marketing</small></div>
+  </div>
+
+  <div class="cover-mid">
+    <div class="eyebrow">Google Ads · Performance Report</div>
+    <h1>Vic. Haulage&nbsp;Co.<br><span>Campaign Update</span></h1>
+    <p class="sub">Month-on-month performance across April–June 2026, with the wins driving more leads at a lower cost.</p>
+  </div>
+
+  <div class="cover-foot">
+    <div>Prepared by <span class="mono">Ready to Rank</span></div>
+    <div>Reporting period <span class="mono">Apr – Jun 2026</span> · <span class="mono">AUD</span></div>
+  </div>
+</header>
+
+<!-- TOC -->
+<section id="contents">
+  <div class="wrap">
+    <div class="kicker">01 · Contents</div>
+    <h2>What's inside</h2>
+    <div class="toc">
+      <a href="#snapshot"><span class="n">01</span><span class="t">Performance snapshot</span><span class="d">Latest 30 days</span></a>
+      <a href="#mom"><span class="n">02</span><span class="t">Month-on-month breakdown</span><span class="d">Apr → Jun</span></a>
+      <a href="#charts"><span class="n">03</span><span class="t">Trends &amp; charts</span><span class="d">Conversions · CTR · CPL</span></a>
+      <a href="#keywords"><span class="n">04</span><span class="t">Keywords doing the heavy lifting</span><span class="d">Top performers</span></a>
+      <a href="#wins"><span class="n">05</span><span class="t">The wins</span><span class="d">What's working</span></a>
+      <a href="#watch"><span class="n">06</span><span class="t">Worth watching &amp; next steps</span><span class="d">Action plan</span></a>
+    </div>
+  </div>
+</section>
+
+<!-- SNAPSHOT -->
+<section id="snapshot">
+  <div class="wrap">
+    <div class="kicker">01 · Snapshot</div>
+    <h2>Performance snapshot</h2>
+    <p class="lead">June 2026 — the active search campaign (R2R&nbsp;|&nbsp;Search). The best month for leads so far.</p>
+    <div class="cards">
+      <div class="card">
+        <div class="lbl">Conversions</div>
+        <div class="val">28</div>
+        <div class="delta up">▲ +65% vs Apr</div>
+        <div class="note">Best month yet</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Click-through rate</div>
+        <div class="val">6.41%</div>
+        <div class="delta up">▲ 11× vs Apr</div>
+        <div class="note">Well above benchmark</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Cost / lead</div>
+        <div class="val">$54</div>
+        <div class="delta up">▲ down 40% vs Apr</div>
+        <div class="note">From $91 in April</div>
+      </div>
+      <div class="card">
+        <div class="lbl">Spend</div>
+        <div class="val">$1,523</div>
+        <div class="delta">Jun 2026</div>
+        <div class="note">~$50/day, budget-capped</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- MONTH ON MONTH -->
+<section id="mom">
+  <div class="wrap">
+    <div class="kicker">02 · Trend</div>
+    <h2>Month-on-month breakdown</h2>
+    <p class="lead">April's high impressions came from a Performance Max campaign since paused. We tightened the
+      account to focused search — fewer impressions, but the right people clicking and converting.</p>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th>Metric</th><th>Apr</th><th>May</th><th>Jun</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>Impressions</td><td>66,319</td><td>12,907</td><td>2,045</td></tr>
+          <tr><td>Clicks</td><td>386</td><td>339</td><td>131</td></tr>
+          <tr class="hl"><td>Conversions</td><td>17</td><td>25</td><td>28</td></tr>
+          <tr><td>CTR</td><td>0.58%</td><td>2.63%</td><td>6.41%</td></tr>
+          <tr><td>Avg. CPC</td><td>$4.03</td><td>$3.20</td><td>$11.63</td></tr>
+          <tr><td>Cost</td><td>$1,553.92</td><td>$1,083.59</td><td>$1,522.89</td></tr>
+          <tr class="hl"><td>Cost / conversion</td><td>$91.41</td><td>$43.34</td><td>$54.39</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+</section>
+
+<!-- CHARTS -->
+<section id="charts">
+  <div class="wrap">
+    <div class="kicker">03 · Charts</div>
+    <h2>Trends &amp; charts</h2>
+    <p class="lead">The shape of the story: leads climbing, engagement sharpening, cost per lead well below where we started.</p>
+
+    <div class="chartbox">
+      <h4>Conversions per month</h4>
+      <canvas id="convChart"></canvas>
+      <div class="cap">Leads have grown every month — 17 → 25 → 28.</div>
+    </div>
+
+    <div class="chartgrid">
+      <div class="chartbox">
+        <h4>Click-through rate (%)</h4>
+        <canvas id="ctrChart"></canvas>
+        <div class="cap">Up 11× as we moved budget into focused search.</div>
+      </div>
+      <div class="chartbox">
+        <h4>Cost per conversion ($)</h4>
+        <canvas id="cplChart"></canvas>
+        <div class="cap">Down from $91 to $54 — best month was May at $43.</div>
+      </div>
+    </div>
+  </div>
+</section>
+
+<!-- KEYWORDS -->
+<section id="keywords">
+  <div class="wrap">
+    <div class="kicker">04 · Keywords</div>
+    <h2>Keywords doing the heavy lifting 🏋️</h2>
+    <p class="lead">Three keywords drive 55% of all leads. One local term — <b>towing yarra valley</b> — is the
+      efficiency standout at just $23 per lead.</p>
+    <div class="tablewrap">
+      <table>
+        <thead>
+          <tr><th>Keyword</th><th>Match</th><th>Conv</th><th>Cost</th><th>Cost / lead</th><th>CTR</th></tr>
+        </thead>
+        <tbody>
+          <tr><td>car towing service near me</td><td>Broad</td><td>5.5</td><td>$426.55</td><td>$77.55</td><td>5.5%</td></tr>
+          <tr><td>towing service melbourne</td><td>Broad</td><td>5.0</td><td>$269.29</td><td>$53.86</td><td>3.8%</td></tr>
+          <tr class="hl"><td>towing yarra valley ★</td><td>Exact</td><td>5.0</td><td>$115.74</td><td>$23.15</td><td>9.6%</td></tr>
+          <tr><td>tow trucks near me</td><td>Exact</td><td>2.0</td><td>$64.28</td><td>$32.14</td><td>5.3%</td></tr>
+          <tr><td>tow truck melbourne</td><td>Broad</td><td>1.0</td><td>$43.52</td><td>$43.52</td><td>4.0%</td></tr>
+          <tr><td>tow truck near me ⚠</td><td>Exact</td><td>1.0</td><td>$149.44</td><td>$149.44</td><td>7.0%</td></tr>
+        </tbody>
+      </table>
+    </div>
+    <p class="lead" style="margin-top:18px">The remaining leads come from a long tail of cheap, high-intent
+      exact-match local town terms — <span class="mono">tow truck pakenham</span>, <span class="mono">towing boronia</span>,
+      <span class="mono">tow truck belgrave</span>, <span class="mono">towing rowville</span> — each landing a lead at $7–$62.</p>
+
+    <div class="wins" style="margin-top:18px">
+      <div class="win"><span class="ico">⭐</span><div><b>The star: "towing yarra valley"</b><p>$23 per lead at a 9.6% CTR — the best keyword in the account. The geographic sweet spot; worth more budget and more town variations around it.</p></div></div>
+      <div class="win"><span class="ico">🚚</span><div><b>The volume engine</b><p>The two broad "near me / melbourne" terms deliver 10.5 of 28 leads — the pricier end, but they're the volume.</p></div></div>
+    </div>
+    <div class="wins watch" style="margin-top:14px">
+      <div class="win"><span class="ico">⚠️</span><div><b>The drag on CPC: "tow truck near me"</b><p>Spent $149 for a single lead at Quality Score 4 — the worst value of any keyword. Paired with "tow trucks near me" at Quality Score 1, these low-relevance near-me terms are inflating cost across the board. A tighter, more relevant landing page lifts Quality Score and pulls CPC back down.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- WINS -->
+<section id="wins">
+  <div class="wrap">
+    <div class="kicker">05 · Wins</div>
+    <h2>The wins 🏆</h2>
+    <div class="wins">
+      <div class="win"><span class="ico">📈</span><div><b>Conversions up every single month</b><p>17 → 25 → 28. That's +65% from April to June, and the strongest month on record.</p></div></div>
+      <div class="win"><span class="ico">🎯</span><div><b>Click-through rate up 11×</b><p>From 0.58% to 6.41%. We cut broad, low-intent traffic and put budget behind tight search — far fewer impressions, but the right people clicking.</p></div></div>
+      <div class="win"><span class="ico">💰</span><div><b>Cost per lead down ~40% vs April</b><p>$91 → $54, with May the standout at just $43 per conversion.</p></div></div>
+      <div class="win"><span class="ico">⚡</span><div><b>More results from less noise</b><p>June drove 28 conversions off just 2,045 impressions. April needed 66,000 impressions for 17. A far more efficient account.</p></div></div>
+    </div>
+  </div>
+</section>
+
+<!-- WATCH + NEXT -->
+<section id="watch">
+  <div class="wrap">
+    <div class="kicker">06 · Action plan</div>
+    <h2>Worth watching</h2>
+    <div class="wins watch">
+      <div class="win"><span class="ico">⚠️</span><div><b>June CPC jumped to $11.63</b><p>Up from $3.20 in May — likely increased competition or a bid-strategy shift. It's the one thing pulling cost-per-lead back up. Reining it in gets us under $40 per lead.</p></div></div>
+      <div class="win"><span class="ico">📊</span><div><b>Conversion value isn't tracked yet</b><p>Conversions are counted but not valued, so we can't report revenue/ROAS. An average job or lead value unlocks dollar-return reporting.</p></div></div>
+    </div>
+
+    <h3>Recommended next steps</h3>
+    <ul class="next">
+      <li><b>Search terms audit</b> — find what's driving the June CPC creep and add negatives to cut waste.</li>
+      <li><b>Set a conversion value</b> — so next month's report shows actual return, not just lead count.</li>
+      <li><b>Decide on the paused campaigns</b> — a "Vic Haulage Co New" search campaign and two P-Max campaigns are sitting idle.</li>
+    </ul>
+  </div>
+</section>
+
+<footer>
+  <div class="brand"><span class="dot"></span><div>Ready to Rank</div></div>
+  <div>Vic. Haulage Co. · Google Ads performance · Apr–Jun 2026 · All figures AUD</div>
+</footer>
+
+<script>
+  const blue='#17B4F0', good='#3FD17A', warn='#F5B042', grid='rgba(255,255,255,.06)', muted='#8A98A5';
+  Chart.defaults.font.family="'Space Mono', monospace";
+  Chart.defaults.color=muted;
+  const months=['Apr','May','Jun'];
+  const baseOpts=(suffix='')=>({
+    responsive:true,
+    plugins:{legend:{display:false},tooltip:{callbacks:{label:c=>c.parsed.y+suffix}}},
+    scales:{
+      x:{grid:{display:false},ticks:{color:muted}},
+      y:{grid:{color:grid},ticks:{color:muted},beginAtZero:true}
+    }
+  });
+
+  new Chart(document.getElementById('convChart'),{
+    type:'bar',
+    data:{labels:months,datasets:[{data:[17,25,28],backgroundColor:[ '#1d5e78','#1f8fbf',blue],borderRadius:8,maxBarThickness:90}]},
+    options:baseOpts()
+  });
+
+  new Chart(document.getElementById('ctrChart'),{
+    type:'line',
+    data:{labels:months,datasets:[{data:[0.58,2.63,6.41],borderColor:good,backgroundColor:'rgba(63,209,122,.12)',fill:true,tension:.3,pointRadius:5,pointBackgroundColor:good,borderWidth:3}]},
+    options:baseOpts('%')
+  });
+
+  new Chart(document.getElementById('cplChart'),{
+    type:'line',
+    data:{labels:months,datasets:[{data:[91.41,43.34,54.39],borderColor:warn,backgroundColor:'rgba(245,176,66,.12)',fill:true,tension:.3,pointRadius:5,pointBackgroundColor:warn,borderWidth:3}]},
+    options:baseOpts('')
+  });
+</script>
+</body>
+</html>
